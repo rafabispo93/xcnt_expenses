@@ -1,0 +1,81 @@
+version: '3'
+
+volumes:
+  zookeeperdata:
+  kafkadata:
+  pgdata:
+
+services:
+  kafka-zookeeper:
+    image: bitnami/zookeeper:latest
+    restart: on-failure
+    expose:
+      - 2181
+    volumes:
+      - zookeeperdata:/bitnami/zookeeper
+    environment:
+      - ZOO_ENABLE_AUTH=yes
+      - ZOO_SERVER_USERS=xcnt
+      - ZOO_SERVER_PASSWORDS=zkpassword
+      - ZOO_CLIENT_USER=xcnt
+      - ZOO_CLIENT_PASSWORD-zkpassword
+
+  kafka:
+    image: bitnami/kafka:latest
+    restart: on-failure
+    depends_on:
+      - kafka-zookeeper
+    expose:
+      - 9092
+      - 9093
+    ports:
+      - "9092:9092"
+    volumes:
+      - kafkadata:/bitnami/kafka
+    environment:
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=kafka-zookeeper:2181
+      - KAFKA_ZOOKEEPER_USER=xcnt
+      - KAFKA_ZOOKEEPER_PASSWORD=zkpassword
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_BROKER_USER=xcnt
+      - KAFKA_BROKER_PASSWORD=kpassword
+      - JMX_PORT=9093
+
+  kafka-manager:
+    image: sheepkiller/kafka-manager
+    restart: on-failure
+    depends_on:
+      - kafka
+    ports:
+      - "9000:9000"
+    environment:
+      - ZK_HOSTS=kafka-zookeeper:2181
+    command: -Dpidfile.path=/dev/null
+
+#   ftp:
+#     image: fauria/vsftpd
+#     restart: on-failure
+#     ports:
+#       - "2121:21"
+#       - "2120:20"
+#       - "21100-21110:21100-21110"
+#     volumes:
+#       - ./ftp:/home/vsftpd/xcnt
+#     environment:
+#       - FTP_USER=xcnt
+#       - FTP_PASS=ftppassword
+
+  postgres:
+    image: postgres:10.8
+    restart: on-failure
+    expose:
+      - 5432
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_USER=sup
+      - POSTGRES_PASSWORD=pgpassword
+      - POSTGRES_MULTIPLE_DATABASES=fuel,members,merchants

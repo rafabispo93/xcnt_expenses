@@ -1,0 +1,9 @@
+FROM golang:1.13
+
+RUN curl -sL https://taskfile.dev/install.sh | sh
+RUN go get github.com/cespare/reflex
+RUN go get github.com/99designs/gqlgen
+
+WORKDIR /app
+EXPOSE 8080
+ENTRYPOINT reflex -r '(\.go$|^go\.mod$)' -d none -s -- task CMD=/build/api run

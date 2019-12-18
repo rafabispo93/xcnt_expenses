@@ -1,0 +1,5 @@
+type Employee {
+    uuid: UUID!
+    firstName: String
+    lastName: String
+}

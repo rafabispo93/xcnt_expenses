@@ -1,0 +1,22 @@
+# .gqlgen.yml example
+#
+# Refer to https://gqlgen.com/config/
+# for detailed .gqlgen.yml documentation.
+
+schema: "./schema/*.graphql"
+
+exec:
+  filename: generated.go
+  package: gql
+
+model:
+  filename: models.go
+  package: gql
+
+resolver:
+  filename: resolver.go
+  type: Resolver
+
+models:
+  UUID:
+    model: dev.azure.com/truckersb2b/edge/api.git/gql.UUID

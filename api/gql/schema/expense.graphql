@@ -1,0 +1,13 @@
+type Expense {
+    uuid: UUID!
+    description: String
+    createdAt: Time!
+    amount: Int
+    currency: String
+    employee: Employee
+}
+
+type ExpensesResult {
+	count: Int!
+	expenses: [Expense!]!
+}

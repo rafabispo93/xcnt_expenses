@@ -1,0 +1,67 @@
+version: '2'
+
+vars:
+  APP_NAME: '{{.APP_NAME | default "api"}}'
+  CMD: '{{.CMD | default (print "./build/api" exeExt)}}'
+  VERSION:
+    sh: git describe --tags --always
+
+env:
+  SSH_PRIVATE_KEY: '{{.SSH_PRIVATE_KEY | default ""}}'
+
+tasks:
+  generate/gql:
+    desc: "generates the gql subpackage"
+    sources:
+      - gql/gqlgen.yml
+      - gql/schema/*.graphql
+    generates:
+      - gql/generated.go
+      - gql/models.go
+    cmds:
+      - go generate ./gql
+
+  generate/state:
+    cmds:
+      - go generate ./state
+
+  build:
+    desc: "builds the command"
+    sources:
+      - go.mod
+      - ./**/*.go
+    generates:
+      - '{{.CMD}}'
+    cmds:
+      - go build -ldflags="-X main.version={{.VERSION}}" -o {{.CMD}}
+
+  run:
+    desc: "builds and runs the command with the --debug flag"
+    deps: [build]
+    cmds:
+      - '{{.CMD}} --debug'
+
+  testcover:
+    desc: "runs unit tests and produces coverage artifacts"
+    vars:
+      TESTCMD: '{{.TESTCMD | default "go test"}}'
+    cmds:
+      - '{{.TESTCMD}} -race -timeout 1s -covermode=atomic -coverprofile coverage.out ./...'
+      - go tool cover -html=coverage.out -o coverage.html
+
+  docker/test-ssh:
+    cmds:
+      - cmd: '{{if empty .SSH_PRIVATE_KEY}}echo "SSH_PRIVATE_KEY must be set"; exit 1{{end}}'
+        silent: true
+
+  docker/dev:
+    desc: "builds the dev Docker image"
+    deps: [docker/test-ssh]
+    cmds:
+      - 'docker build -t xcnt/{{.APP_NAME}}-dev -f Dockerfile.dev --build-arg SSH_PRIVATE_KEY .'
+
+  docker/deploy:
+    desc: "builds the deployable Docker image"
+    deps: [docker/test-ssh]
+    cmds:
+      - 'docker build -t xcnt/{{.APP_NAME}} -t xcnt/{{.APP_NAME}}:{{.VERSION}} --target deploy --build-arg SSH_PRIVATE_KEY .'
