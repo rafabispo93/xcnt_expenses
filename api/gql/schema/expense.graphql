@@ -1,8 +1,8 @@
 type Expense {
-    uuid: UUID!
+    uuid: String!
     description: String
-    createdAt: Time!
-    amount: Int
+    createdAt: String!
+    amount: Float
     currency: String
     employee: Employee
 }

@@ -19,4 +19,4 @@ resolver:
 
 models:
   UUID:
-    model: dev.azure.com/truckersb2b/edge/api.git/gql.UUID
+    model: github.com/rafabispo93/xcnt_expenses.git/api/gql.UUID

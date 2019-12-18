@@ -1,0 +1,9 @@
+# coverage artifacts
+coverage.out
+coverage.html
+
+# build artifacts
+build/
+
+# task
+.task/

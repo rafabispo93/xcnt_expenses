@@ -1,5 +1,5 @@
 type Employee {
-    uuid: UUID!
+    uuid: String!
     firstName: String
     lastName: String
 }
