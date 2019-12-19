@@ -52,19 +52,6 @@ services:
       - ZK_HOSTS=kafka-zookeeper:2181
     command: -Dpidfile.path=/dev/null
 
-#   ftp:
-#     image: fauria/vsftpd
-#     restart: on-failure
-#     ports:
-#       - "2121:21"
-#       - "2120:20"
-#       - "21100-21110:21100-21110"
-#     volumes:
-#       - ./ftp:/home/vsftpd/xcnt
-#     environment:
-#       - FTP_USER=xcnt
-#       - FTP_PASS=ftppassword
-
   postgres:
     image: postgres:10.8
     restart: on-failure
@@ -78,4 +65,20 @@ services:
     environment:
       - POSTGRES_USER=sup
       - POSTGRES_PASSWORD=pgpassword
-      - POSTGRES_MULTIPLE_DATABASES=fuel,members,merchants
+      - POSTGRES_MULTIPLE_DATABASES=api
+
+  api:
+    image: edge/api-dev
+    depends_on:
+      - postgres
+      - kafka
+    healthcheck:
+      test: ["CMD", "curl", "http://localhost:8080/health"]
+    ports:
+      - "8020:8080"
+    volumes:
+      - ../members:/app
+    environment:
+      - ALLOWED_ORIGINS=http://localhost:8020
+      - DB_CXN=postgres://sup:pgpassword@postgres:5432/api?application_name=api;sslmode=disable
+      - KAFKA_ADDR=kafka://kafka:9092
