@@ -1,4 +1,4 @@
-module github.com/rafabispo93/xcnt_expenses.git/api
+module github.com/rafabispo93/xcnt_expenses.git
 
 go 1.13
 
