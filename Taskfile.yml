@@ -1,0 +1,12 @@
+version: '2'
+
+tasks:
+  docker/dev/api:
+    desc: "builds api dev Docker image"
+    cmds:
+      - pushd ../api > /dev/null; task docker/dev; popd > /dev/null
+
+  docker/dev:
+    desc: "builds all dev Docker images"
+    deps:
+      - docker/dev/api

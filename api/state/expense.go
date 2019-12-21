@@ -6,6 +6,8 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
+//go:generate gqlgen
+
 // ExpenseTableName is the name of the expense table.
 const ExpenseTableName = "expense"
 

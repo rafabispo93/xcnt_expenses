@@ -1,7 +1,6 @@
 FROM golang:1.13 AS build
 
 RUN curl -sL https://taskfile.dev/install.sh | sh
-RUN go get github.com/99designs/gqlgen
 
 COPY . /app
 WORKDIR /app

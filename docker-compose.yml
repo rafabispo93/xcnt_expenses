@@ -68,7 +68,7 @@ services:
       - POSTGRES_MULTIPLE_DATABASES=api
 
   api:
-    image: edge/api-dev
+    image: xcnt/api-dev
     depends_on:
       - postgres
       - kafka
@@ -77,7 +77,7 @@ services:
     ports:
       - "8020:8080"
     volumes:
-      - ../members:/app
+      - ./api:/app
     environment:
       - ALLOWED_ORIGINS=http://localhost:8020
       - DB_CXN=postgres://sup:pgpassword@postgres:5432/api?application_name=api;sslmode=disable

@@ -3,11 +3,7 @@ version: '2'
 vars:
   APP_NAME: '{{.APP_NAME | default "api"}}'
   CMD: '{{.CMD | default (print "./build/api" exeExt)}}'
-  VERSION:
-    sh: git describe --tags --always
-
-env:
-  SSH_PRIVATE_KEY: '{{.SSH_PRIVATE_KEY | default ""}}'
+  VERSION: "0.1.0"
 
 tasks:
   generate/gql:
@@ -49,19 +45,12 @@ tasks:
       - '{{.TESTCMD}} -race -timeout 1s -covermode=atomic -coverprofile coverage.out ./...'
       - go tool cover -html=coverage.out -o coverage.html
 
-  docker/test-ssh:
-    cmds:
-      - cmd: '{{if empty .SSH_PRIVATE_KEY}}echo "SSH_PRIVATE_KEY must be set"; exit 1{{end}}'
-        silent: true
-
   docker/dev:
     desc: "builds the dev Docker image"
-    deps: [docker/test-ssh]
     cmds:
-      - 'docker build -t xcnt/{{.APP_NAME}}-dev -f Dockerfile.dev --build-arg SSH_PRIVATE_KEY .'
+      - 'docker build -t xcnt/{{.APP_NAME}}-dev -f Dockerfile.dev .'
 
   docker/deploy:
     desc: "builds the deployable Docker image"
-    deps: [docker/test-ssh]
     cmds:
-      - 'docker build -t xcnt/{{.APP_NAME}} -t xcnt/{{.APP_NAME}}:{{.VERSION}} --target deploy --build-arg SSH_PRIVATE_KEY .'
+      - 'docker build -t xcnt/{{.APP_NAME}} -t xcnt/{{.APP_NAME}}:{{.VERSION}} --target deploy .'
